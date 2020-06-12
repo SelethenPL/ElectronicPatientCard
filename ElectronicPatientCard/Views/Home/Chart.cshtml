@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Chart Data";
+}
+
+@using (Html.BeginForm("Chart", "Home", FormMethod.Post))
+{
+    @Html.DropDownList("dateType",
+    new List<SelectListItem>() {
+        new SelectListItem(text: "All Time", value: "all", true),
+        new SelectListItem(text: "5 years", value: "5years"),
+        new SelectListItem(text: "1 year", value: "1year"),
+        new SelectListItem(text: "6 months", value: "6months"),
+        new SelectListItem(text: "3 months", value: "3months"),
+        new SelectListItem(text: "1 month", value: "1month")
+
+    })
+    <p>
+        <input type="submit" value="Submit" />
+    </p>
+}
+
+@ViewBag.MessagePost
+
+
+<div id="chartContainer"></div>
+
+
+<script type="text/javascript">
+
+    window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer", {
+            theme: "light1",
+            animationEnabled: true,
+            title: {
+                text: "Chart of glucose level."
+            },
+            data: [
+                {
+                    type: "line",
+                    dataPoints: @Html.Raw(ViewBag.DataPoints)
+                }
+            ]
+        });
+        chart.render();
+    };
+</script>
+
+
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js">

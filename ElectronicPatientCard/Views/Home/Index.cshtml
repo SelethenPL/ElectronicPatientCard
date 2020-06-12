@@ -1,0 +1,48 @@
+﻿@model List<Hl7.Fhir.Model.Patient>
+
+ @{
+    ViewData["Title"] = "Patient List";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Search surname: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" />
+    </p>
+}
+
+<table class="table">
+    <tr>
+        <td>
+            <strong>
+                @Html.ActionLink("First Name", "Index", new { sortOrder = ViewBag.FirstNameSortParam })
+            </strong>
+        </td>
+        <td>
+            <strong>
+                @Html.ActionLink("Surname", "Index", new { sortOrder = ViewBag.SurnameSortParam })
+            </strong>
+        </td>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name[0].Given)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name[0].Family)
+        </td>
+        <td>
+            @Html.ActionLink("Details", "ShowDetails", new { item.Id })
+        </td>
+    </tr>
+    }
+
+</table>

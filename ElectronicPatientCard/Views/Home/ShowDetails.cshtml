@@ -1,0 +1,40 @@
+﻿@model List<ElectronicPatientCard.Models.Details>
+
+@{
+    ViewData["Title"] = "Show Details";
+}
+
+<h1>ShowDetails</h1>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Check glucose level chart in time ->
+        @Html.ActionLink("Chart", "Chart", new { id = ViewBag.ID })
+    </p>
+}
+
+
+<table class="table">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.reason)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.resourceName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit" + item.resourceName, new { id = item.id, type = item.resourceName, patientID = ViewBag.ID })
+            </td>
+
+        </tr>
+    }
+</table>
