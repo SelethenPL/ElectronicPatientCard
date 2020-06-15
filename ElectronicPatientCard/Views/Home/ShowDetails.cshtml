@@ -35,7 +35,7 @@
             @Html.ActionLink("Edit", "Edit", new { id = item.id, type = item.resourceName, patientID = ViewBag.ID })
         </td>
         <td>
-            @Html.ActionLink("Versions:" + item.version, "ShowResourceVersion", new { patientID = ViewBag.ID })
+            @Html.ActionLink("Versions:" + item.version, "ShowResourceVersion", new { rId = item.id, id = ViewBag.ID })
         </td>
 
     </tr>

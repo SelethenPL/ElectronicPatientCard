@@ -22,6 +22,6 @@ namespace ElectronicPatientCard.Models
 
         public string version { get; set; }
 
-        
+        public DateTime modDate { get; set;  }
     }
 }

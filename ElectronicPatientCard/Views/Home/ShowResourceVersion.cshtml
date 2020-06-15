@@ -1,11 +1,11 @@
-﻿@model List<ElectronicPatientCard.Models.PatientEdit>
+﻿@model List<ElectronicPatientCard.Models.Details>
 
  @{
-    ViewData["Title"] = "Patient versions";
+    ViewData["Title"] = "Resource versions";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Patient Versions</h1>
+    <h1 class="display-4">Resource Versions</h1>
 </div>
 
 @using (Html.BeginForm())
@@ -23,24 +23,20 @@
         </td>
         <td>
             <strong>
-                Surname
+                Date of observation
             </strong>
         </td>
         <td>
             <strong>
-                Date of birth
+                Name
             </strong>
         </td>
         <td>
             <strong>
-                Marital Status
+                version
             </strong>
         </td>
-        <td>
-            <strong>
-                Version
-            </strong>
-        </td>
+
     </tr>
     @foreach (var item in Model)
     {
@@ -49,13 +45,10 @@
                 @Html.DisplayFor(modelItem => item.modDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.surname)
+                @Html.DisplayFor(modelItem => item.date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.birthDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.mStatus)
+                @Html.DisplayFor(modelItem => item.reason)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.version)

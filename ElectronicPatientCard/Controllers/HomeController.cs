@@ -438,13 +438,71 @@ namespace ElectronicPatientCard.Controllers
                 vPatient.birthDate = resultResource.BirthDate;
                 vPatient.mStatus = resultResource.MaritalStatus.Text;
                 vPatient.version = resultResource.Meta.VersionId;
+                vPatient.modDate =  Convert.ToDateTime(resultResource.Meta.LastUpdated.ToString());
                 patientList.Add(vPatient);
             }
             
             return View(patientList);
         }
 
-       
+        public ActionResult ShowResourceVersion(string rId, string id)
+        {
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
+
+            Patient patient = conn.Read<Patient>("Patient/" + id);
+
+            UriBuilder uriBuilder = new UriBuilder("http://localhost:8080/baseR4");
+            uriBuilder.Path = "Patient/" + patient.Id;
+            Resource resultResource = conn.InstanceOperation(uriBuilder.Uri, "everything");
+            var resourceList = new List<Details>();
+
+            if (resultResource is Bundle)
+            {
+                Bundle resultBundle = resultResource as Bundle;
+                while (resultBundle != null)
+                {
+                    foreach (var i in resultBundle.Entry)
+                    {
+                        Details element = new Details();
+                        switch (i.Resource.TypeName)
+                        {
+                            case "Observation":
+                                Observation observation = (Observation)i.Resource;
+                                if (observation.Id == rId)
+                                {
+                                    element.id = observation.Id;
+                                    element.resourceName = "Observation";
+                                    element.reason = observation.Code.Text;
+                                    element.version = observation.Meta.VersionId;
+                                    int versions = int.Parse(element.version);
+                                    for (int j = 1; j <= versions; j++)
+                                    {
+                                        Details vPatient = new Details();
+                                        UriBuilder uriBuilder1 = new UriBuilder("http://localhost:8080/baseR4");
+                                        uriBuilder1.Path = "Observation/" + element.id + "/_history/" + j;
+                                        Observation resultResource1 = conn.Read<Observation>(uriBuilder1.Uri);
+                                        vPatient.id = resultResource1.Id;
+                                        vPatient.reason = resultResource1.Code.Text;
+                                        vPatient.date = Convert.ToDateTime(resultResource1.Effective.ToString());
+                                        vPatient.version = resultResource1.Meta.VersionId;
+                                        vPatient.modDate = Convert.ToDateTime(resultResource1.Meta.LastUpdated.ToString());
+                                        resourceList.Add(vPatient);
+                                    }
+
+                                }
+                                break;
+
+                        }
+                    }
+                    resultBundle = conn.Continue(resultBundle, PageDirection.Next);
+                }
+            }
+
+
+            return View(resourceList);
+        
+        }
 
         public IActionResult Privacy()
         {
