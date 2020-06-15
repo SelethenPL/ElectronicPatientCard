@@ -1,0 +1,38 @@
+﻿@model List<ElectronicPatientCard.Models.PatientEdit>
+
+ @{
+    ViewData["Title"] = "Patient versions";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Patient Versions</h1>
+</div>
+
+@using (Html.BeginForm())
+{
+    
+}
+
+<table class="table">
+    
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.surname)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.birthDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.mStatus)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.version)
+        </td>
+
+    </tr>
+    }
+
+</table>

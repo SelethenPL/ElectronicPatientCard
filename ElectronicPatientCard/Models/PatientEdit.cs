@@ -19,5 +19,9 @@ namespace ElectronicPatientCard.Models
         public string mStatus { get; set; }
 
         public string id { get; set; }
+
+        public string version { get; set; }
+
+        
     }
 }

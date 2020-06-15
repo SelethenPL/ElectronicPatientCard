@@ -379,12 +379,7 @@ namespace ElectronicPatientCard.Controllers
                                     resultResourceBack.Code.Text = item.reason;
                                     conn.Update(resultResourceBack);
                 
-                                     UriBuilder uriBuilderBack1 = new UriBuilder("http://localhost:8080/baseR4");
-                                    uriBuilderBack1.Path = "Observation/" + item.id+"/_history/1";
-                                    Observation resultResourceBack1 = conn.Read<Observation>(uriBuilderBack1.Uri);
-                                    fetchedElement.date = resultResourceBack1.Effective;
-                                    fetchedElement.reason = resultResourceBack1.Code.Text;
-                                    fetchedElement.amount = resultResourceBack1.Meta.VersionId;
+                                   
 
 
                                 }
@@ -415,7 +410,39 @@ namespace ElectronicPatientCard.Controllers
         {
             return View(new Details());
         }
+        
+        public ActionResult ShowPatientVersion(string id)
+        {
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
 
+            Patient patient = conn.Read<Patient>("Patient/" + id);
+
+            var patientList = new List<PatientEdit>();
+
+            PatientEdit newPatient = new PatientEdit();
+            newPatient.surname = patient.Name[0].Family;
+            newPatient.birthDate = patient.BirthDate;
+            newPatient.mStatus = patient.MaritalStatus.Text;
+            newPatient.id = patient.Id;
+            newPatient.version = patient.Meta.VersionId;
+            int versions = int.Parse(newPatient.version);
+
+            for (int i = 1; i <= versions; i++)
+            {
+                PatientEdit vPatient = new PatientEdit();
+                UriBuilder uriBuilder = new UriBuilder("http://localhost:8080/baseR4");
+                uriBuilder.Path = "Patient/" + id + "/_history/"+i;
+                Patient resultResource = conn.Read<Patient>(uriBuilder.Uri);
+                vPatient.surname = resultResource.Name[0].Family;
+                vPatient.birthDate = resultResource.BirthDate;
+                vPatient.mStatus = resultResource.MaritalStatus.Text;
+                vPatient.version = resultResource.Meta.VersionId;
+                patientList.Add(vPatient);
+            }
+            
+            return View(patientList);
+        }
 
        
 
