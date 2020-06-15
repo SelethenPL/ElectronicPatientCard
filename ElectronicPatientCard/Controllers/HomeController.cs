@@ -11,6 +11,7 @@ using Hl7.FhirPath.Sprache;
 using System.Web;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Hl7.Fhir.Support;
 
 namespace ElectronicPatientCard.Controllers
 {
@@ -218,6 +219,36 @@ namespace ElectronicPatientCard.Controllers
             return View();
         }
 
+
+        public ViewResult EditPatient(string id)
+        {
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
+
+            Patient patient = conn.Read<Patient>("Patient/" + id);
+
+            PatientEdit newPatient = new PatientEdit();
+            newPatient.surname = patient.Name[0].Family;
+            newPatient.birthDate = patient.BirthDate;
+            newPatient.mStatus = patient.MaritalStatus.Text;
+            newPatient.id = patient.Id;
+
+            return View(newPatient);
+        }
+
+        public ActionResult SavePatient(PatientEdit patient)
+        {
+           
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
+
+            Patient patientNew = conn.Read<Patient>("Patient/" + patient.id);
+            patientNew.Name[0].Family = patient.surname;
+            patientNew.BirthDate = patient.birthDate;
+            patientNew.MaritalStatus.Text = patient.mStatus;
+            conn.Update(patientNew);
+            return View();
+        }
         public ViewResult Edit(string id, string resourceName, string patientId)
         {
             
@@ -235,7 +266,6 @@ namespace ElectronicPatientCard.Controllers
             ViewBag.Name = patient.Name[0].Given.FirstOrDefault();
             ViewBag.birthDate = new Date(patient.BirthDate.ToString());
 
-            var listElement = new List<Details>();
             var selectedElement = new DetailsPatient();
 
             if (resultResource is Bundle)
@@ -254,16 +284,13 @@ namespace ElectronicPatientCard.Controllers
                                 {
                                     element.id = observation.Id;
                                     element.resourceName = "Observation";
-                                    element.date = Convert.ToDateTime(observation.Effective.ToString());
+                                    element.date = observation.Effective;
                                     element.reason = observation.Code.Text;
+                                    element.amount = observation.Meta.VersionId;
 
-                                    Quantity amount = observation.Value as Quantity;
-                                    if (amount != null)
-                                    {
-                                        element.amount = amount.Value + " " + amount.Unit;
-                                    }
+                                    
                                     element.patientId = patient.Id;
-                                    //listElement.Add(element);
+                              
                                     selectedElement = element;
                                 }                             
                                 break;
@@ -274,10 +301,11 @@ namespace ElectronicPatientCard.Controllers
                                 {
                                     element.id = medicationRequest.Id;
                                     element.resourceName = "MedicationRequest";
-                                    element.date = Convert.ToDateTime(medicationRequest.AuthoredOn.ToString());
+                                   
                                     element.reason += ((CodeableConcept)medicationRequest.Medication).Text;
                                     element.patientId = patientId;
-                                    //listElement.Add(element);
+                                    element.amount = medicationRequest.Meta.VersionId;
+                                    
                                     selectedElement = element;
                                 }                               
                                 break;
@@ -291,6 +319,7 @@ namespace ElectronicPatientCard.Controllers
             return View(selectedElement);
         }
         [HttpPost]
+        [Obsolete]
         public ActionResult Save(DetailsPatient item)
         {
             DetailsPatient element = new DetailsPatient();
@@ -300,12 +329,90 @@ namespace ElectronicPatientCard.Controllers
             element.resourceName = item.resourceName;
             element.id = item.id;
             element.patientId = item.patientId;
+
+
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
+
+            Patient patient = conn.Read<Patient>("Patient/" + element.patientId);
+
+            UriBuilder uriBuilder = new UriBuilder("http://localhost:8080/baseR4");
+            uriBuilder.Path = "Patient/" + patient.Id;
+            Resource resultResource = conn.InstanceOperation(uriBuilder.Uri, "everything");
+
+            ViewBag.Surname = patient.Name[0].Family;
+            ViewBag.ID = patient.Id;
+            ViewBag.Name = patient.Name[0].Given.FirstOrDefault();
+            ViewBag.birthDate = new Date(patient.BirthDate.ToString());
+
+
+            if (resultResource is Bundle)
+            {
+                Bundle resultBundle = resultResource as Bundle;
+                while (resultBundle != null)
+                {
+                    foreach (var i in resultBundle.Entry)
+                    {
+                        DetailsPatient fetchedElement = new DetailsPatient();
+                        switch (i.Resource.TypeName)
+                        {
+                            case "Observation":
+                                Observation observation = (Observation)i.Resource;
+                                
+                                if (observation.Id == item.id)
+                                {
+
+                                    fetchedElement.date = observation.Effective;
+                                    fetchedElement.reason = observation.Code.Text;
+                                    fetchedElement.amount = observation.Meta.VersionId;
+
+
+                                    UriBuilder uriBuilderBack = new UriBuilder("http://localhost:8080/baseR4");
+                                    uriBuilderBack.Path = "Observation/" + item.id;
+                                    Observation  resultResourceBack = conn.Read<Observation>(uriBuilderBack.Uri);
+
+                            
+                                    resultResourceBack.Code.Text = item.reason;
+                                    conn.Update(resultResourceBack);
+                
+                                     UriBuilder uriBuilderBack1 = new UriBuilder("http://localhost:8080/baseR4");
+                                    uriBuilderBack1.Path = "Observation/" + item.id+"/_history/1";
+                                    Observation resultResourceBack1 = conn.Read<Observation>(uriBuilderBack1.Uri);
+                                    fetchedElement.date = resultResourceBack1.Effective;
+                                    fetchedElement.reason = resultResourceBack1.Code.Text;
+                                    fetchedElement.amount = resultResourceBack1.Meta.VersionId;
+
+
+                                }
+                                break;
+
+                            case "MedicationRequest":
+                                MedicationRequest medicationRequest = (MedicationRequest)i.Resource;
+                                if (medicationRequest.Id == item.id)
+                                {
+                                    fetchedElement.amount = medicationRequest.Meta.VersionId;
+
+                                    //fetchedElement.date = medicationRequest.AuthoredOn
+                                    //fetchedElement.reason += ((CodeableConcept)medicationRequest.Medication).Text;
+
+                                }
+                                break;
+                        }
+                    }
+                    resultBundle = conn.Continue(resultBundle, PageDirection.Next);
+                }
+            }
+
+
+
             return View(element);
         }
         public ActionResult Save()
         {
             return View(new Details());
         }
+
+
        
 
         public IActionResult Privacy()

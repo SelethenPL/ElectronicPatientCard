@@ -15,12 +15,12 @@
             @Html.DisplayFor(model => model.resourceName)
         </td>
     </tr>
-
     <tr>
         <td>
-            @Html.TextBoxFor(model => model.date, new { style = "width:100%;" })
+            @Html.DisplayFor(model => model.date)
         </td>
     </tr>
+
     <tr>
         <td>
             @Html.TextBoxFor(model => model.reason, new { style = "width:100%;" })
@@ -28,9 +28,10 @@
     </tr>
     <tr>
         <td>
-            @Html.TextBoxFor(model => model.amount, new { style = "width:100%;" })
+            @Html.DisplayFor(model => model.amount)
         </td>
     </tr>
+
     <tr>
         <td>
             <input type="submit" value="Save" />
@@ -49,6 +50,16 @@
     <tr>
         <td>
             @Html.TextBoxFor(model => model.patientId, new { style = "display: none;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.amount, new { style = "display: none;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.date, new { style = "display: none;" })
         </td>
     </tr>
 </table>

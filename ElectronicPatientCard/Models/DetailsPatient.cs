@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hl7.Fhir.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace ElectronicPatientCard.Models
     {
         [Display(Name = "Date")]
         [DataType(DataType.Date)]
-        public DateTime date { get; set; }
+        public Hl7.Fhir.Model.Element date { get; set; }
 
         [Display(Name = "Reason")]
         public string reason { get; set; }
