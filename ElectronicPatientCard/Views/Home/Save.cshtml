@@ -1,0 +1,39 @@
+﻿@model ElectronicPatientCard.Models.DetailsPatient
+
+@{
+    ViewData["Title"] = "Save";
+}
+
+<h2>Saved changes</h2>
+
+@using (Html.BeginForm("Save", "Home", FormMethod.Post))
+{
+}
+    <table class="table">
+
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.resourceName)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.date, new { style = "width:100%;" })
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.reason, new { style = "width:100%;" })
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.amount, new { style = "width:100%;" })
+            </td>
+        </tr>
+        
+        
+    </table>
+
+

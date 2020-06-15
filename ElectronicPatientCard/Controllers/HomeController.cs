@@ -236,7 +236,7 @@ namespace ElectronicPatientCard.Controllers
             ViewBag.birthDate = new Date(patient.BirthDate.ToString());
 
             var listElement = new List<Details>();
-            var selectedElement = new Details();
+            var selectedElement = new DetailsPatient();
 
             if (resultResource is Bundle)
             {
@@ -245,7 +245,7 @@ namespace ElectronicPatientCard.Controllers
                 {
                     foreach (var i in resultBundle.Entry)
                     {
-                        Details element = new Details();
+                        DetailsPatient element = new DetailsPatient();
                         switch (i.Resource.TypeName)
                         {
                             case "Observation":
@@ -262,8 +262,8 @@ namespace ElectronicPatientCard.Controllers
                                     {
                                         element.amount = amount.Value + " " + amount.Unit;
                                     }
-
-                                    listElement.Add(element);
+                                    element.patientId = patient.Id;
+                                    //listElement.Add(element);
                                     selectedElement = element;
                                 }                             
                                 break;
@@ -276,8 +276,8 @@ namespace ElectronicPatientCard.Controllers
                                     element.resourceName = "MedicationRequest";
                                     element.date = Convert.ToDateTime(medicationRequest.AuthoredOn.ToString());
                                     element.reason += ((CodeableConcept)medicationRequest.Medication).Text;
-
-                                    listElement.Add(element);
+                                    element.patientId = patientId;
+                                    //listElement.Add(element);
                                     selectedElement = element;
                                 }                               
                                 break;
@@ -287,10 +287,26 @@ namespace ElectronicPatientCard.Controllers
                 }
             }
            
-            //  listElement = listElement.OrderByDescending(s => s.date).ToList();
 
             return View(selectedElement);
         }
+        [HttpPost]
+        public ActionResult Save(DetailsPatient item)
+        {
+            DetailsPatient element = new DetailsPatient();
+            element.date = item.date;
+            element.reason = item.reason;
+            element.amount = item.amount;
+            element.resourceName = item.resourceName;
+            element.id = item.id;
+            element.patientId = item.patientId;
+            return View(element);
+        }
+        public ActionResult Save()
+        {
+            return View(new Details());
+        }
+       
 
         public IActionResult Privacy()
         {

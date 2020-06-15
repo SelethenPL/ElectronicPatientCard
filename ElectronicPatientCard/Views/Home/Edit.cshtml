@@ -1,4 +1,4 @@
-﻿@model ElectronicPatientCard.Models.Details
+﻿@model ElectronicPatientCard.Models.DetailsPatient
 
 @{
     ViewData["Title"] = "Edit";
@@ -6,36 +6,53 @@
 
 <h2>Edit resources</h2>
 
-@using (Html.BeginForm("Edit", "Home", FormMethod.Post))
+@using (Html.BeginForm("Save", "Home", FormMethod.Post))
 {
+<table class="table">
 
-    <table class="table">
+    <tr>
+        <td>
+            @Html.DisplayFor(model => model.resourceName)
+        </td>
+    </tr>
 
-        <tr>
-            <td>
-                @Html.DisplayFor(model => model.resourceName)
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                @Html.TextBoxFor(model => model.date, new { style = "width:100%;"})
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.TextBoxFor(model => model.reason, new { style = "width:100%;"})
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.TextBoxFor(Model => Model.amount, new { style = "width:100%;" })
-            </td>
-        </tr>
-
-    </table>
-    <p>
-        <input type="submit" value="Save" />
-    </p>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.date, new { style = "width:100%;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.reason, new { style = "width:100%;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.amount, new { style = "width:100%;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="submit" value="Save" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.id, new { style = "display: none;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.resourceName, new { style = "display: none;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.TextBoxFor(model => model.patientId, new { style = "display: none;" })
+        </td>
+    </tr>
+</table>
 }
-@ViewBag.MessageUpdate
+
+
+
