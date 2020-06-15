@@ -45,6 +45,9 @@
     <td>
         @Html.ActionLink("Edit", "EditPatient", new { item.Id })
     </td>
+    <td>
+        @Html.ActionLink("Versions:"+item.Meta.VersionId, "ShowPatientVersion", new { item.Id })
+    </td>
 </tr>
     }
 

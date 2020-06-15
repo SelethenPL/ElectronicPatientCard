@@ -113,6 +113,9 @@ namespace ElectronicPatientCard.Controllers
                                 element.resourceName = "Observation";
                                 element.date = Convert.ToDateTime(observation.Effective.ToString());
                                 element.reason = observation.Code.Text;
+                                element.version = observation.Meta.VersionId;
+                                
+
 
                                 Quantity amount = observation.Value as Quantity;
                                 if (amount != null)
@@ -131,6 +134,7 @@ namespace ElectronicPatientCard.Controllers
                                 element.resourceName = "MedicationRequest";
                                 element.date = Convert.ToDateTime(medicationRequest.AuthoredOn.ToString());
                                 element.reason += ((CodeableConcept) medicationRequest.Medication).Text;
+                                element.version = medicationRequest.Meta.VersionId;
 
                                 listElement.Add(element);
                                 break;

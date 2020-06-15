@@ -21,5 +21,6 @@ namespace ElectronicPatientCard.Models
         public string resourceName { get; set; }
 
         public string id { get; set; }
+        public string version { get; set; }
     }
 }
