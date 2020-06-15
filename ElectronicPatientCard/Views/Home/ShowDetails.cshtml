@@ -32,7 +32,7 @@
                 @Html.DisplayFor(modelItem => item.resourceName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit" + item.resourceName, new { id = item.id, type = item.resourceName, patientID = ViewBag.ID })
+                @Html.ActionLink("Edit", "Edit", new { id = item.id, type = item.resourceName, patientID = ViewBag.ID})
             </td>
 
         </tr>

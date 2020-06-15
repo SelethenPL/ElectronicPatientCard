@@ -218,6 +218,80 @@ namespace ElectronicPatientCard.Controllers
             return View();
         }
 
+        public ViewResult Edit(string id, string resourceName, string patientId)
+        {
+            
+            var conn = new FhirClient("http://localhost:8080/baseR4");
+            conn.PreferredFormat = ResourceFormat.Json;
+
+            Patient patient = conn.Read<Patient>("Patient/" + patientId);
+
+            UriBuilder uriBuilder = new UriBuilder("http://localhost:8080/baseR4");
+            uriBuilder.Path = "Patient/" + patient.Id;
+            Resource resultResource = conn.InstanceOperation(uriBuilder.Uri, "everything");
+
+            ViewBag.Surname = patient.Name[0].Family;
+            ViewBag.ID = patient.Id;
+            ViewBag.Name = patient.Name[0].Given.FirstOrDefault();
+            ViewBag.birthDate = new Date(patient.BirthDate.ToString());
+
+            var listElement = new List<Details>();
+            var selectedElement = new Details();
+
+            if (resultResource is Bundle)
+            {
+                Bundle resultBundle = resultResource as Bundle;
+                while (resultBundle != null)
+                {
+                    foreach (var i in resultBundle.Entry)
+                    {
+                        Details element = new Details();
+                        switch (i.Resource.TypeName)
+                        {
+                            case "Observation":
+                                Observation observation = (Observation)i.Resource;
+                                if (observation.Id == id)
+                                {
+                                    element.id = observation.Id;
+                                    element.resourceName = "Observation";
+                                    element.date = Convert.ToDateTime(observation.Effective.ToString());
+                                    element.reason = observation.Code.Text;
+
+                                    Quantity amount = observation.Value as Quantity;
+                                    if (amount != null)
+                                    {
+                                        element.amount = amount.Value + " " + amount.Unit;
+                                    }
+
+                                    listElement.Add(element);
+                                    selectedElement = element;
+                                }                             
+                                break;
+
+                            case "MedicationRequest":
+                                MedicationRequest medicationRequest = (MedicationRequest)i.Resource;
+                                if (medicationRequest.Id == id)
+                                {
+                                    element.id = medicationRequest.Id;
+                                    element.resourceName = "MedicationRequest";
+                                    element.date = Convert.ToDateTime(medicationRequest.AuthoredOn.ToString());
+                                    element.reason += ((CodeableConcept)medicationRequest.Medication).Text;
+
+                                    listElement.Add(element);
+                                    selectedElement = element;
+                                }                               
+                                break;
+                        }
+                    }
+                    resultBundle = conn.Continue(resultBundle, PageDirection.Next);
+                }
+            }
+           
+            //  listElement = listElement.OrderByDescending(s => s.date).ToList();
+
+            return View(selectedElement);
+        }
+
         public IActionResult Privacy()
         {
             return View();

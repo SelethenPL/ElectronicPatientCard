@@ -1,0 +1,41 @@
+﻿@model ElectronicPatientCard.Models.Details
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit resources</h2>
+
+@using (Html.BeginForm("Edit", "Home", FormMethod.Post))
+{
+
+    <table class="table">
+
+        <tr>
+            <td>
+                @Html.DisplayFor(model => model.resourceName)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.TextBoxFor(model => model.date, new { style = "width:100%;"})
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.TextBoxFor(model => model.reason, new { style = "width:100%;"})
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.TextBoxFor(Model => Model.amount, new { style = "width:100%;" })
+            </td>
+        </tr>
+
+    </table>
+    <p>
+        <input type="submit" value="Save" />
+    </p>
+}
+@ViewBag.MessageUpdate
